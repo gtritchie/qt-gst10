@@ -23,7 +23,6 @@ RUN apt-get install -y \
     libgstreamer1.0-dev  \
     libgstreamer-plugins-base1.0-dev \
     libicu-dev \
-    libwebp-dev \
     libx11-dev \
     libx11-xcb-dev \
     libxcb1-dev \
@@ -42,14 +41,16 @@ RUN apt-get install -y \
 # perform configuration
 RUN mkdir -p /qt/Qt5.4.2/5.4/gcc_64 \
     && cd /qt/qt-everywhere-opensource-src-5.4.2 \
-    && ./configure -prefix /qt/Qt5.4.2/5.4/gcc_64 -opensource -confirm-license -nomake tests -nomake examples -verbose -qt-xcb 
+    && ./configure -prefix /qt/Qt5.4.2/5.4/gcc_64 -opensource -confirm-license -no-reduce-relocations -nomake tests -nomake examples -verbose -qt-xcb 
 
-# compile
+# compile (this takes a long time)
 RUN cd /qt/qt-everywhere-opensource-src-5.4.2 \
     && make -j4  \
     && make install
 
-# rewrite RPATH for libraries
+# rewrite RPATH for libraries. by default the RPATH is set to the resolved
+# -prefix passed to 'configure', but we need the libraries to be able to find
+# each other regardless of where they're installed
 RUN cd /qt/Qt5.4.2/5.4/gcc_64/lib \
     && chrpath -k -r '$ORIGIN' *.so; exit 0 
 
