@@ -49,11 +49,33 @@ RUN cd /qt/qt-everywhere-opensource-src-5.4.2 \
     && make -j4  \
     && make install
 
+# these system libraries are bundled with the Qt distribution, but not 
+# built from sources, so copy them into our own "distribution" folder
+RUN cp /usr/lib/x86_64-linux-gnu/libicudata.so.55.1 \
+       /usr/lib/x86_64-linux-gnu/libicui18n.so.55.1 \
+       /usr/lib/x86_64-linux-gnu/libicuio.so.55.1   \
+       /usr/lib/x86_64-linux-gnu/libicule.so.55.1   \
+       /usr/lib/x86_64-linux-gnu/libiculx.so.55.1   \
+       /usr/lib/x86_64-linux-gnu/libicutest.so.55.1 \
+       /usr/lib/x86_64-linux-gnu/libicutu.so.55.1   \
+       /usr/lib/x86_64-linux-gnu/libicuuc.so.55.1 /qt/Qt5.4.2/5.4/gcc_64/lib
+
+# softlink paths
+RUN cd /qt/Qt5.4.2/5.4/gcc_64/lib \
+    && ln -s libicudata.so.55.1  libicudata.so.55  \
+    && ln -s libicui18n.so.55.1  libicui18n.so.55 \
+    && ln -s libicuio.so.55.1    libicuio.so.55 \
+    && ln -s libicule.so.55.1    libicule.so.55 \
+    && ln -s libiculx.so.55.1    libiculx.so.55 \
+    && ln -s libicutest.so.55.1  libicutest.so.55 \
+    && ln -s libicutu.so.55.1    libicutu.so.55 \
+    && ln -s libicuuc.so.55.1    libicuuc.so.55
+
 # rewrite RPATH for libraries. by default the RPATH is set to the resolved
 # -prefix passed to 'configure', but we need the libraries to be able to find
 # each other regardless of where they're installed
 RUN cd /qt/Qt5.4.2/5.4/gcc_64/lib \
-    && chrpath -k -r '$ORIGIN' *.so; exit 0 
+    && chrpath -k -r '$ORIGIN' *.so*; exit 0 
 
 # rewrite RPATH for binaries
 RUN cd /qt/Qt5.4.2/5.4/gcc_64/bin \
