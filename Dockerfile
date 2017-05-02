@@ -22,6 +22,7 @@ RUN apt-get install -y \
     libgl1-mesa-dev \
     libgstreamer1.0-dev  \
     libgstreamer-plugins-base1.0-dev \
+    libgtk2.0-dev \
     libicu-dev \
     libx11-dev \
     libx11-xcb-dev \
