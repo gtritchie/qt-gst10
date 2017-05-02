@@ -1,4 +1,4 @@
-FROM ubuntu:16.04
+FROM ioft/i386-ubuntu:16.04
 
 # install qt download prereqs
 RUN apt-get update \
@@ -40,9 +40,9 @@ RUN apt-get install -y \
     ruby
 
 # perform configuration
-RUN mkdir -p /qt/Qt5.4.2/5.4/gcc_64 \
+RUN mkdir -p /qt/Qt5.4.2/5.4/gcc \
     && cd /qt/qt-everywhere-opensource-src-5.4.2 \
-    && ./configure -prefix /qt/Qt5.4.2/5.4/gcc_64 -opensource -confirm-license -no-reduce-relocations -nomake tests -nomake examples -verbose -qt-xcb 
+    && ./configure -prefix /qt/Qt5.4.2/5.4/gcc -opensource -confirm-license -no-reduce-relocations -nomake tests -nomake examples -verbose -qt-xcb -qt-pcre -qt-libpng
 
 # compile (this takes a long time)
 RUN cd /qt/qt-everywhere-opensource-src-5.4.2 \
@@ -51,17 +51,17 @@ RUN cd /qt/qt-everywhere-opensource-src-5.4.2 \
 
 # these system libraries are bundled with the Qt distribution, but not 
 # built from sources, so copy them into our own "distribution" folder
-RUN cp /usr/lib/x86_64-linux-gnu/libicudata.so.55.1 \
-       /usr/lib/x86_64-linux-gnu/libicui18n.so.55.1 \
-       /usr/lib/x86_64-linux-gnu/libicuio.so.55.1   \
-       /usr/lib/x86_64-linux-gnu/libicule.so.55.1   \
-       /usr/lib/x86_64-linux-gnu/libiculx.so.55.1   \
-       /usr/lib/x86_64-linux-gnu/libicutest.so.55.1 \
-       /usr/lib/x86_64-linux-gnu/libicutu.so.55.1   \
-       /usr/lib/x86_64-linux-gnu/libicuuc.so.55.1 /qt/Qt5.4.2/5.4/gcc_64/lib
+RUN cp /usr/lib/i386-linux-gnu/libicudata.so.55.1 \
+       /usr/lib/i386-linux-gnu/libicui18n.so.55.1 \
+       /usr/lib/i386-linux-gnu/libicuio.so.55.1   \
+       /usr/lib/i386-linux-gnu/libicule.so.55.1   \
+       /usr/lib/i386-linux-gnu/libiculx.so.55.1   \
+       /usr/lib/i386-linux-gnu/libicutest.so.55.1 \
+       /usr/lib/i386-linux-gnu/libicutu.so.55.1   \
+       /usr/lib/i386-linux-gnu/libicuuc.so.55.1 /qt/Qt5.4.2/5.4/gcc/lib
 
 # softlink paths
-RUN cd /qt/Qt5.4.2/5.4/gcc_64/lib \
+RUN cd /qt/Qt5.4.2/5.4/gcc/lib \
     && ln -s libicudata.so.55.1  libicudata.so.55  \
     && ln -s libicui18n.so.55.1  libicui18n.so.55 \
     && ln -s libicuio.so.55.1    libicuio.so.55 \
@@ -74,14 +74,14 @@ RUN cd /qt/Qt5.4.2/5.4/gcc_64/lib \
 # rewrite RPATH for libraries. by default the RPATH is set to the resolved
 # -prefix passed to 'configure', but we need the libraries to be able to find
 # each other regardless of where they're installed
-RUN cd /qt/Qt5.4.2/5.4/gcc_64/lib \
+RUN cd /qt/Qt5.4.2/5.4/gcc/lib \
     && chrpath -k -r '$ORIGIN' *.so*; exit 0 
 
 # rewrite RPATH for binaries
-RUN cd /qt/Qt5.4.2/5.4/gcc_64/bin \
+RUN cd /qt/Qt5.4.2/5.4/gcc/bin \
     && chrpath -k -r '$ORIGIN/../lib' *; exit 0 
 
 # produce tarball 
 RUN cd /qt \
-    && tar czvf QtSDK-5.4.2-x86_64.tar.gz Qt5.4.2
+    && tar czvf QtSDK-5.4.2-x86.tar.gz Qt5.4.2
 
