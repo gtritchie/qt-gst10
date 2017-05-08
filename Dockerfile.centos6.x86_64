@@ -19,9 +19,15 @@ RUN yum install -y \
     gperf \
     gstreamer \
     gstreamer-devel \
+    gtk2-devel \
+    intltool \
     libicu-devel \
+    libX11-devel \
     libxcb \
     libxcb-devel \
+    libxkbcommon-devel \ 
+    libXext \
+    libXext-devel \
     libxslt-devel \
     libXrender \
     libXrender-devel \
@@ -34,7 +40,28 @@ RUN yum install -y \
     xcb-util-keysyms-devel \
     xcb-util-wm \
     xcb-util-wm-devel \
-    ruby
+    xkbcomp \
+    ruby \
+    xz
+
+# install libxkbcommon; have to build from source, there's no CentOS package
+# which supplies this. must be done before configuring Qt since qt needs libxkb
+RUN cd /tmp \
+    && wget http://xkbcommon.org/download/libxkbcommon-0.5.0.tar.xz \
+    && tar xvf libxkbcommon-0.5.0.tar.xz \
+    && cd libxkbcommon-0.5.0 \
+    && ./configure \
+    && make -j4 \
+    && make install
+
+# install keyboard config files
+RUN cd /tmp \
+    && wget http://www.x.org/releases/individual/data/xkeyboard-config/xkeyboard-config-2.19.tar.bz2 \
+    && tar xvf xkeyboard-config-2.19.tar.bz2 \
+    && cd xkeyboard-config-2.19 \
+    && ./configure \
+    && make \
+    && make install
 
 # perform configuration
 RUN mkdir -p /qt/Qt5.4.1/5.4/gcc_64 \
@@ -53,7 +80,6 @@ RUN cp /usr/lib64/libicudata.so.42.1 \
        /usr/lib64/libicuio.so.42.1   \
        /usr/lib64/libicule.so.42.1   \
        /usr/lib64/libiculx.so.42.1   \
-       /usr/lib64/libicutest.so.42.1 \
        /usr/lib64/libicutu.so.42.1   \
        /usr/lib64/libicuuc.so.42.1 /qt/Qt5.4.1/5.4/gcc_64/lib
 
@@ -64,7 +90,6 @@ RUN cd /qt/Qt5.4.1/5.4/gcc_64/lib \
     && ln -s libicuio.so.42.1    libicuio.so.42 \
     && ln -s libicule.so.42.1    libicule.so.42 \
     && ln -s libiculx.so.42.1    libiculx.so.42 \
-    && ln -s libicutest.so.42.1  libicutest.so.42 \
     && ln -s libicutu.so.42.1    libicutu.so.42 \
     && ln -s libicuuc.so.42.1    libicuuc.so.42
 
