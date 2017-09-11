@@ -81,6 +81,10 @@ RUN cd /qt/Qt5.4.2/5.4/gcc/lib \
 RUN cd /qt/Qt5.4.2/5.4/gcc/bin \
     && chrpath -k -r '$ORIGIN/../lib' *; exit 0 
 
+# rewrite RPATH for image format plugins
+RUN cd /qt/Qt5.4.2/5.4/gcc_64/plugins/imageformats \
+    && chrpath -k -r '$ORIGIN/../../lib' *.so; exit 0 
+
 # produce tarball 
 RUN cd /qt \
     && tar czvf QtSDK-5.4.2-x86.tar.gz Qt5.4.2
