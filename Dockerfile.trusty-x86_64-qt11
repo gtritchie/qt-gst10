@@ -1,0 +1,230 @@
+# Dockerfile.trusty-x86_64-qt11
+# Build Qt 5.11.1 on Ubuntu Trusty
+# Produces QtSDK-5.11.1-trusty-x86_64.tar.gz
+
+FROM ubuntu:trusty
+
+ENV QT_BUILD_VER_SHORT 5.11
+ENV QT_BUILD_VER ${QT_BUILD_VER_SHORT}.1
+ENV QT_SOURCE_PACKAGE qt-everywhere-src-${QT_BUILD_VER}.tar.xz
+ENV PLATFORM_NAME trusty
+
+# install qt download prereqs
+RUN apt-get update \
+    && apt-get install -y \
+    wget \
+    xz-utils
+
+# download qt (do this early for caching)
+RUN mkdir /qt \
+    && cd /qt \
+    && wget https://download.qt.io/archive/qt/$QT_BUILD_VER_SHORT/$QT_BUILD_VER/single/$QT_SOURCE_PACKAGE \
+    && tar xJvf $QT_SOURCE_PACKAGE \
+    && rm $QT_SOURCE_PACKAGE
+
+# install build tools
+RUN apt-get install -y \
+    bison build-essential \
+    flex \
+    gperf \
+    ibgstreamer-plugins-base0.10-dev \
+    libasound2-dev \
+    libatkmm-1.6-dev \
+    libbz2-dev \
+    libcap-dev \
+    libcups2-dev \
+    libdbus-1-dev \
+    libdrm-dev \
+    libegl1-mesa-dev \
+    libfontconfig1-dev \
+    libfreetype6-dev \
+    libgcrypt11-dev \
+    libglu1-mesa-dev \
+    libgstreamer0.10-dev \
+    libicu-dev \
+    libnss3-dev \
+    libpci-dev \
+    libpulse-dev \
+    libssl-dev \
+    libudev-dev \
+    libx11-dev \
+    libx11-xcb-dev \
+    libxcb-composite0 \
+    libxcb-composite0-dev \
+    libxcb-cursor-dev \
+    libxcb-cursor0 \
+    libxcb-damage0 \
+    libxcb-damage0-dev \
+    libxcb-dpms0 \
+    libxcb-dpms0-dev \
+    libxcb-dri2-0 \
+    libxcb-dri2-0-dev \
+    libxcb-dri3-0 \
+    libxcb-dri3-dev \
+    libxcb-ewmh-dev \
+    libxcb-ewmh2 \
+    libxcb-glx0 \
+    libxcb-glx0-dev \
+    libxcb-icccm4 \
+    libxcb-icccm4-dev \
+    libxcb-image0 \
+    libxcb-image0-dev \
+    libxcb-keysyms1 \
+    libxcb-keysyms1-dev \
+    libxcb-present-dev \
+    libxcb-present0 \
+    libxcb-randr0 \
+    libxcb-randr0-dev \
+    libxcb-record0 \
+    libxcb-record0-dev \
+    libxcb-render-util0 \
+    libxcb-render-util0-dev \
+    libxcb-render0 \
+    libxcb-render0-dev \
+    libxcb-res0 \
+    libxcb-res0-dev \
+    libxcb-screensaver0 \
+    libxcb-screensaver0-dev \
+    libxcb-shape0 \
+    libxcb-shape0-dev libxcb-shm0 \
+    libxcb-shm0-dev \
+    libxcb-sync-dev \
+    libxcb-sync0-dev \
+    libxcb-sync1 \
+    libxcb-util0-dev \
+    libxcb-xevie0 \
+    libxcb-xevie0-dev \
+    libxcb-xf86dri0 \
+    libxcb-xf86dri0-dev \
+    libxcb-xfixes0 \
+    libxcb-xfixes0-dev \
+    libxcb-xinerama0 \
+    libxcb-xinerama0-dev \
+    libxcb-xkb-dev \
+    libxcb-xkb1 \
+    libxcb-xprint0 \
+    libxcb-xprint0-dev \
+    libxcb-xtest0 \
+    libxcb-xtest0-dev \
+    libxcb-xv0 \
+    libxcb-xv0-dev \
+    libxcb-xvmc0 \
+    libxcb-xvmc0-dev \
+    libxcb1 \
+    libxcb1-dev \
+    libxcomposite-dev \
+    libxcursor-dev \
+    libxdamage-dev \
+    libxext-dev \
+    libxfixes-dev \
+    libxi-dev \
+    libxrandr-dev \
+    libxrender-dev \
+    libxslt-dev \
+    libxss-dev \
+    libxtst-dev \
+    perl \
+    python \
+    ruby
+
+# Note: Dependencies needed on Ubuntu 16 but not 14
+# libxcb-util-dev
+# libxcb-util1
+
+# perform configuration
+RUN mkdir -p /qt/Qt${QT_BUILD_VER}/${QT_BUILD_VER}/gcc_64 \
+    && cd /qt/qt-everywhere-src-${QT_BUILD_VER} \
+    && ./configure -prefix /qt/Qt${QT_BUILD_VER}/${QT_BUILD_VER}/gcc_64 -opensource -confirm-license \
+       -no-reduce-relocations -nomake tests -nomake examples -verbose \
+       -qt-xcb -qt-libpng -qt-pcre \
+       -skip qt3d \
+       -skip qtactiveqt \
+       -skip qtandroidextras \
+       -skip qtcanvas3d \
+       -skip qtcharts \
+       -skip qtconnectivity \
+       -skip qtdatavis3d \
+       -skip qtdeclarative \
+       -skip qtdoc \
+       -skip qtgamepad \
+       -skip qtgraphicaleffects \ 
+       -skip qtimageformats \
+       -skip qtlocation \ 
+       -skip qtmacextras \
+       -skip qtmultimedia \
+       -skip qtnetworkauth \
+       -skip qtpurchasing \
+       -skip qtquickcontrols \
+       -skip qtquickcontrols2 \
+       -skip qtremoteobjects \
+       -skip qtscript \
+       -skip qtscxml \
+       -skip qtsensors \
+       -skip qtserialbus \
+       -skip qtserialport \
+       -skip qtspeech \
+       -skip qtsvg \
+       -skip qttools \
+       -skip qttranslations \
+       -skip qtvirtualkeyboard \
+       -skip qtwayland \
+       -skip qtwebglplugin \
+       -skip qtwebsockets \
+       -skip qtwebview \
+       -skip qtwinextras \
+       -skip qtx11extras \
+       -skip qtxmlpatterns
+
+# Note: Included Qt components
+# -skip qtbase \
+# -skip qtwebchannel \
+# -skip qtwebengine \
+
+# compile (this takes a long time)
+RUN cd /qt/qt-everywhere-src-${QT_BUILD_VER} \
+    && make -j4 
+    
+# install
+RUN cd /qt/qt-everywhere-src-${QT_BUILD_VER} \
+    && make install
+    
+# these system libraries are bundled with the Qt distribution, but not 
+# built from sources, so copy them into our own "distribution" folder
+RUN cp /usr/lib/x86_64-linux-gnu/libicudata.so.52.1 \
+       /usr/lib/x86_64-linux-gnu/libicui18n.so.52.1 \
+       /usr/lib/x86_64-linux-gnu/libicuio.so.52.1   \
+       /usr/lib/x86_64-linux-gnu/libicule.so.52.1   \
+       /usr/lib/x86_64-linux-gnu/libiculx.so.52.1   \
+       /usr/lib/x86_64-linux-gnu/libicutest.so.52.1 \
+       /usr/lib/x86_64-linux-gnu/libicutu.so.52.1   \
+       /usr/lib/x86_64-linux-gnu/libicuuc.so.52.1 /qt/Qt${QT_BUILD_VER}/${QT_BUILD_VER}/gcc_64/lib
+
+# softlink paths
+RUN cd /qt/Qt${QT_BUILD_VER}/${QT_BUILD_VER}/gcc_64/lib \
+    && ln -s libicudata.so.52.1  libicudata.so.52  \
+    && ln -s libicui18n.so.52.1  libicui18n.so.52 \
+    && ln -s libicuio.so.52.1    libicuio.so.52 \
+    && ln -s libicule.so.52.1    libicule.so.52 \
+    && ln -s libiculx.so.52.1    libiculx.so.52 \
+    && ln -s libicutest.so.52.1  libicutest.so.52 \
+    && ln -s libicutu.so.52.1    libicutu.so.52 \
+    && ln -s libicuuc.so.52.1    libicuuc.so.52
+
+# rewrite RPATH for libraries. by default the RPATH is set to the resolved
+# -prefix passed to 'configure', but we need the libraries to be able to find
+# each other regardless of where they're installed
+RUN cd /qt/Qt${QT_BUILD_VER}/${QT_BUILD_VER}/gcc_64/lib \
+    && chrpath -k -r '$ORIGIN' *.so*; exit 0 
+
+# rewrite RPATH for binaries
+RUN cd /qt/Qt${QT_BUILD_VER}/${QT_BUILD_VER}/gcc_64/bin \
+    && chrpath -k -r '$ORIGIN/../lib' *; exit 0 
+
+# rewrite RPATH for image format plugins
+RUN cd /qt/Qt${QT_BUILD_VER}/${QT_BUILD_VER}/gcc_64/plugins/imageformats \
+    && chrpath -k -r '$ORIGIN/../../lib' *.so; exit 0 
+
+# produce tarball 
+RUN cd /qt \
+    && tar czvf QtSDK-${QT_BUILD_VER}-${PLATFORM_NAME}-x86_64.tar.gz Qt${QT_BUILD_VER}
+
