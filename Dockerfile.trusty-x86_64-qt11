@@ -28,26 +28,35 @@ RUN apt-get install -y \
     build-essential \
     flex \
     gperf \
+    gyp \
     ibgstreamer-plugins-base0.10-dev \
     libasound2-dev \
     libatkmm-1.6-dev \
+    libavcodec-dev \
+    libavformat-dev \
+    libavutil-dev \
     libbz2-dev \
     libcap-dev \
     libcups2-dev \
     libdbus-1-dev \
     libdrm-dev \
     libegl1-mesa-dev \
+    libevent-dev \
     libfontconfig1-dev \
     libfreetype6-dev \
     libgcrypt11-dev \
     libglu1-mesa-dev \
     libgstreamer0.10-dev \
     libicu-dev \
+    libjsoncpp-dev \
     libnss3-dev \
+    libopus-dev \
     libpci-dev \
     libpulse-dev \
+    libsrtp0-dev \
     libssl-dev \
     libudev-dev \
+    libwebp-dev \
     libx11-dev \
     libx11-xcb-dev \
     libxcb-composite0 \
@@ -124,14 +133,16 @@ RUN apt-get install -y \
     libxslt-dev \
     libxss-dev \
     libxtst-dev \
+    ninja-build \
     perl \
     pkg-config \
     python \
     ruby
 
 # Note: Dependencies needed on Ubuntu 16 but not 14
-# libxcb-util-dev
-# libxcb-util1
+# libminizip-dev \
+# libxcb-util-dev \
+# libxcb-util1 \
 
 # perform configuration
 RUN mkdir -p /qt/Qt${QT_BUILD_VER}/${QT_BUILD_VER}/gcc_64 \
